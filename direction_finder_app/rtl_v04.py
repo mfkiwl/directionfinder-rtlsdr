@@ -219,48 +219,49 @@ while True:
         latitudx=gpsd.fix.latitude                                   
         longitudx = gpsd.fix.longitude
         sleep(0.3)
-    afegeix_linea(linia_temp.potencia_senyal,linia_temp.latitud,linia_temp.longitud,linia_temp.orientacio)
+    if linia_temp.potencia_senyal != 0:
+        afegeix_linea(linia_temp.potencia_senyal,linia_temp.latitud,linia_temp.longitud,linia_temp.orientacio)
+    if len(totes_senyals) != 0:
+        #Si la longitud de la llista on hi han guardats els maxims es mes petita que el maxim de linies que hi han d'avber(10):
+        if (len(maxims) < NUM_MAXIMS):
+            #Crea un altre element a la llista de maxims amb el valor de l'index de totes_senyals aon sta la senyal en questio
+            counter_sp = len(maxims)
+            maxims.append(len(maxims))
+            canvi = True           #Fa que s'actgivi la part de programa que m0envia dades per Bluetooth
 
-    #Si la longitud de la llista on hi han guardats els maxims es mes petita que el maxim de linies que hi han d'avber(10):
-    if (len(maxims) < NUM_MAXIMS):
-        #Crea un altre element a la llista de maxims amb el valor de l'index de totes_senyals aon sta la senyal en questio
-        counter_sp = len(maxims)
-        maxims.append(len(maxims))
-        canvi = True           #Fa que s'actgivi la part de programa que m0envia dades per Bluetooth
+        if (len(maxims) == NUM_MAXIMS):   #Te PINTA QUE VA DAVANT DE L'ALTRE IFF
+            maxims_plens = True
+        #Si hi han tots els maxims, es pot comparar els diferents valors que hihan guardats
+        if (maxims_plens):
+            #_max te el valor de els diferents index que hi han a la llista de maxims
+            for _max in maxims:
+                #Si la senyal que hi ha es mes baixa que minima_senyal (arxiu temporal), substitueix mima senyal
+                if (totes_senyals[_max].potencia_senyal < minima_senyal):
+                    minima_senyal = totes_senyals[_max].potencia_senyal #minim senyal = senyal miima que hi ha en la taula de maxims
+                    index_min_pot = _max                                #index de totes_senyals on esta la senyal minima
+                    counter_sp  = maxims.index(_max)                    #num d'element a la llista de maxims
+                    #MINIMA_SENYAL I INDEX_MIN_POT s'han de formatejar al acabar la iteracio
+            if (totes_senyals[index_min_pot].potencia_senyal < linia_temp.potencia_senyal):
+                maxims[counter_sp] =  len(totes_senyals)-1  #Subsitueixo l'index on hi ha el minim dels maxims per la longitud de la taula de totes_senyals, que equival al numero d'element-
+                canvi = True            
+                #substitueixo el valor que hi havia a maxims per el nou valor maxim
+                #el nou valor es el nou que acaba d'entrar, per tant equival a la llargada de la llista totes_senyals
+            interseccio_linies()
 
-    if (len(maxims) == NUM_MAXIMS):   #Te PINTA QUE VA DAVANT DE L'ALTRE IFF
-        maxims_plens = True
-    #Si hi han tots els maxims, es pot comparar els diferents valors que hihan guardats
-    if (maxims_plens):
-        #_max te el valor de els diferents index que hi han a la llista de maxims
-        for _max in maxims:
-            #Si la senyal que hi ha es mes baixa que minima_senyal (arxiu temporal), substitueix mima senyal
-            if (totes_senyals[_max].potencia_senyal < minima_senyal):
-                minima_senyal = totes_senyals[_max].potencia_senyal #minim senyal = senyal miima que hi ha en la taula de maxims
-                index_min_pot = _max                                #index de totes_senyals on esta la senyal minima
-                counter_sp  = maxims.index(_max)                    #num d'element a la llista de maxims
-                #MINIMA_SENYAL I INDEX_MIN_POT s'han de formatejar al acabar la iteracio
-        if (totes_senyals[index_min_pot].potencia_senyal < linia_temp.potencia_senyal):
-            maxims[counter_sp] =  len(totes_senyals)-1  #Subsitueixo l'index on hi ha el minim dels maxims per la longitud de la taula de totes_senyals, que equival al numero d'element-
-            canvi = True            
-            #substitueixo el valor que hi havia a maxims per el nou valor maxim
-            #el nou valor es el nou que acaba d'entrar, per tant equival a la llargada de la llista totes_senyals
-        interseccio_linies()
-
-    #En cas que s'hagi afegit una nova linia(quan encara no estan totes), o be quan es modifiqui algun maxim,calcula l'altre punt de la recta, i el guarda en la mateixa taula
-    if (canvi):
-        totes_senyals[len(totes_senyals)-1].latitud_2  = totes_senyals[len(totes_senyals)-1].latitud  + 20*math.sin(totes_senyals[len(totes_senyals)-1].orientacio)  #sumo la part sinus a la latitud i cosinus a longitud.
-        totes_senyals[len(totes_senyals)-1].longitud_2 = totes_senyals[len(totes_senyals)-1].longitud + 20*math.cos(totes_senyals[len(totes_senyals)-1].orientacio)
-        string_linia = "[[" + str(totes_senyals[len(totes_senyals)-1].latitud) + "," + str(totes_senyals[len(totes_senyals)-1].longitud) + "],[" + str(totes_senyals[len(totes_senyals)-1].latitud_2) + "," + str(totes_senyals[len(totes_senyals)-1].longitud_2) + "]]"
-        counter_sp_msg = counter_sp + 1
-        bluetooth_missatge = str(linia_temp.potencia_senyal) + '!' + str(counter_sp_msg) + '!' + string_linia + '!' + cercle_bool + '!' + str(cercle_long) + '!' + str(cercle_lat) #sumo els diferents elements que formen el missatge a enviar
-        try:
-            print("enviant missatge bth...")
-            client_sock.send(bluetooth_missatge)  #envio el missatge per bluetooth
-            print("enviat:  ")
-            print (bluetooth_missatge)
-        except IOError:
-            pass
+        #En cas que s'hagi afegit una nova linia(quan encara no estan totes), o be quan es modifiqui algun maxim,calcula l'altre punt de la recta, i el guarda en la mateixa taula
+        if (canvi):
+            totes_senyals[len(totes_senyals)-1].latitud_2  = totes_senyals[len(totes_senyals)-1].latitud  + 20*math.sin(totes_senyals[len(totes_senyals)-1].orientacio)  #sumo la part sinus a la latitud i cosinus a longitud.
+            totes_senyals[len(totes_senyals)-1].longitud_2 = totes_senyals[len(totes_senyals)-1].longitud + 20*math.cos(totes_senyals[len(totes_senyals)-1].orientacio)
+            string_linia = "[[" + str(totes_senyals[len(totes_senyals)-1].latitud) + "," + str(totes_senyals[len(totes_senyals)-1].longitud) + "],[" + str(totes_senyals[len(totes_senyals)-1].latitud_2) + "," + str(totes_senyals[len(totes_senyals)-1].longitud_2) + "]]"
+            counter_sp_msg = counter_sp + 1
+            bluetooth_missatge = str(linia_temp.potencia_senyal) + '!' + str(counter_sp_msg) + '!' + string_linia + '!' + cercle_bool + '!' + str(cercle_long) + '!' + str(cercle_lat) #sumo els diferents elements que formen el missatge a enviar
+            try:
+                print("enviant missatge bth...")
+                client_sock.send(bluetooth_missatge)  #envio el missatge per bluetooth
+                print("enviat:  ")
+                print (bluetooth_missatge)
+            except IOError:
+                pass
     
     #Un cop ha acabat l'interval, retorno a 0 els valors d'aquests tres per a que no interfereixi en la primera lectura de l'interval seguent
     reset_linia_temp()
