@@ -200,7 +200,8 @@ while True:
             ##
             ##
             ##CANVI!!!!!!!!!!!!!!!!!!!!!!!!!
-            linia_temp.orientacio = orientation     #si la variable que estic lleguint es mes fran que la variable anterior, la guardo.
+            if i != 0:
+                linia_temp.orientacio = orientation     #si la variable que estic lleguint es mes fran que la variable anterior, la guardo.
         sleep(0.1)
     afegeix_linea(linia_temp.potencia_senyal,linia_temp.latitud,linia_temp.longitud,linia_temp.orientacio)
 
