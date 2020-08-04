@@ -110,7 +110,18 @@ def get_data():
             max_pow = dat
 
 def get_orientation(x1, y1, x2, y2):
-    if x2>x1:
+    if x2 == x1:
+        if y2>y1:
+            return radians(0)
+        else:
+            return radians(180)
+    elif y2 == y1:
+        if x2>x1:
+            return radians(270)
+        else:
+            return radians(90)
+
+    elif x2>x1:
         if y2>y1:
             #positiu
             return radians(270 + (180*math.atan((y2-y1)/(x2-x1)))/math.pi)
