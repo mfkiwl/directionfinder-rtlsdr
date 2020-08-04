@@ -110,7 +110,7 @@ def get_data():
             max_pow = dat
 
 def get_orientation(lati, longi, lati2, longi2):
-    return arctan((lati2-lati)/(longi2-longi))
+    return math.atan((lati2-lati)/(longi2-longi))
 
 
 #Classe per a tenir les variables de les diferents linies en una taula d'aquest objecte
