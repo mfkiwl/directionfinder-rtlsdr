@@ -112,31 +112,31 @@ def get_data():
 def get_orientation(x1, y1, x2, y2):
     if x2 == x1:
         if y2>y1:
-            return radians(0)
+            return math.radians(0)
         else:
-            return radians(180)
+            return math.radians(180)
     elif y2 == y1:
         if x2>x1:
-            return radians(270)
+            return math.radians(270)
         else:
-            return radians(90)
+            return math.radians(90)
 
     elif x2>x1:
         if y2>y1:
             #positiu
-            return radians(270 + (180*math.atan((y2-y1)/(x2-x1)))/math.pi)
+            return math.radians(270 + (180*math.atan((y2-y1)/(x2-x1)))/math.pi)
         else:
             #longitud positiva pero negatiu latitud (mira dreta avall)
-            return radians(180+(180*math.atan((x2-x1)/(y2-y1)))/math.pi)
+            return math.radians(180+(180*math.atan((x2-x1)/(y2-y1)))/math.pi)
     else:
         #negatiu longitud ( mira esquerre)
         if y2>y1:
             #mira esquerre adalt
-            return radians((180*math.atan((x2-x1)/(y2-y1)))/math.pi)
+            return math.radians((180*math.atan((x2-x1)/(y2-y1)))/math.pi)
 
         else:
             #esquerre abaix
-            return radians(180-(180*math.atan((x2-x1)/(y2-y1)))/math.pi)
+            return math.radians(180-(180*math.atan((x2-x1)/(y2-y1)))/math.pi)
 
 
 #Classe per a tenir les variables de les diferents linies en una taula d'aquest objecte
