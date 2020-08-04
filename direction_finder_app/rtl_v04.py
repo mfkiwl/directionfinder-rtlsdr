@@ -109,6 +109,10 @@ def get_data():
         if dat > max_pow:
             max_pow = dat
 
+def get_orientation(lati, longi, lati2, longi2):
+    return arctan((lati2-lati)/(longi2-longi))
+
+
 #Classe per a tenir les variables de les diferents linies en una taula d'aquest objecte
 class class_linia():
     def __init__(self):
@@ -255,6 +259,3 @@ while True:
     maxima_senyal2   = 0
     canvi            = False
     counter_sp       = 0
-
-def get_orientation(lati, longi, lati2, longi2):
-    return arctan((lati2-lati)/(longi2-longi))
