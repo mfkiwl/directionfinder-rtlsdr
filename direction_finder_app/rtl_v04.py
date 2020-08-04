@@ -109,11 +109,23 @@ def get_data():
         if dat > max_pow:
             max_pow = dat
 
-def get_orientation(lati, longi, lati2, longi2):
-    if longi2 != longi:
-        return math.atan((lati2-lati)/(longi2-longi))
+def get_orientation(x1, y1, x2, y2):
+    if x2>x1:
+        if y2>y1:
+            #positiu
+            return radians(270 + (180*math.atan((y2-y1)/(x2-x1)))/math.pi)
+        else:
+            #longitud positiva pero negatiu latitud (mira dreta avall)
+            return radians(180+(180*math.atan((x2-x1)/(y2-y1)))/math.pi)
     else:
-        return 90
+        #negatiu longitud ( mira esquerre)
+        if y2>y1:
+            #mira esquerre adalt
+            return radians((180*math.atan((x2-x1)/(y2-y1)))/math.pi)
+
+        else:
+            #esquerre abaix
+            return radians(180-(180*math.atan((x2-x1)/(y2-y1)))/math.pi)
 
 
 #Classe per a tenir les variables de les diferents linies en una taula d'aquest objecte
@@ -193,23 +205,20 @@ print("EXECUTANT FOX HUNTER")
 
 #LOOP PRINCIPAL DEL PROGRAMA
 while True:
+    latitudx=gpsd.fix.latitude
+    longitudx=gpsd.fix.longitude
     for i in range (20):                             #FOR I en un interval a definir (aprox 45 sec)
         get_data()
-        latitudx=gpsd.fix.latitude                                      #agafo les dades del RTL_SDR i guardo el valor de maxima potencia en una variable global
-        longitudx = gpsd.fix.longitude
-        if i != 0:
-            orientation =get_orientation(latitudx,longitudx, gpsd.fix.latitude, gpsd.fix.longitude)
-        if (max_pow > linia_temp.potencia_senyal):
+        orientation = get_orientation(latitudx,longitudx, gpsd.fix.latitude, gpsd.fix.longitude)
+        if (max_pow > linia_temp.potencia_senyal and max_pow > 1):
             linia_temp.potencia_senyal = max_pow
             linia_temp.latitud= gpsd.fix.latitude
             linia_temp.longitud = gpsd.fix.longitude
-            ##
-            ##
-            ##
-            ##CANVI!!!!!!!!!!!!!!!!!!!!!!!!!
             if i != 0:
                 linia_temp.orientacio = orientation     #si la variable que estic lleguint es mes fran que la variable anterior, la guardo.
-        sleep(0.1)
+        latitudx=gpsd.fix.latitude                                   
+        longitudx = gpsd.fix.longitude
+        sleep(0.3)
     afegeix_linea(linia_temp.potencia_senyal,linia_temp.latitud,linia_temp.longitud,linia_temp.orientacio)
 
     #Si la longitud de la llista on hi han guardats els maxims es mes petita que el maxim de linies que hi han d'avber(10):
@@ -245,7 +254,6 @@ while True:
         string_linia = "[[" + str(totes_senyals[len(totes_senyals)-1].latitud) + "," + str(totes_senyals[len(totes_senyals)-1].longitud) + "],[" + str(totes_senyals[len(totes_senyals)-1].latitud_2) + "," + str(totes_senyals[len(totes_senyals)-1].longitud_2) + "]]"
         counter_sp_msg = counter_sp + 1
         bluetooth_missatge = str(linia_temp.potencia_senyal) + '!' + str(counter_sp_msg) + '!' + string_linia + '!' + cercle_bool + '!' + str(cercle_long) + '!' + str(cercle_lat) #sumo els diferents elements que formen el missatge a enviar
-        print("intento try")
         try:
             print("enviant missatge bth...")
             client_sock.send(bluetooth_missatge)  #envio el missatge per bluetooth
