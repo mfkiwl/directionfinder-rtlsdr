@@ -90,7 +90,7 @@ uuid = "80571af6-21c9-48a0-9df5-cffb60cf79af"
 advertise_service( server_sock, "SampleServer",
                    service_id = uuid,
                    service_classes = [ uuid, SERIAL_PORT_CLASS ],
-                   profiles = [ SERIAL_PORT_PROFILE ], 
+                   #profiles = [ SERIAL_PORT_PROFILE ], 
                    #protocols = [ OBEX_UUID ] 
                     )
 
