@@ -73,3 +73,11 @@ class direction_finder():
 			print (self.gpsd.fix.latitude)
 			print (self.rtl.get_max())
 			sleep(4)
+
+
+fox_app = direction_finder()
+
+if __name__ == "__main__":
+	fox_app.init_gps()
+	fox_app.init_rtl()
+	fox_app.main()
