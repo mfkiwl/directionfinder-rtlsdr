@@ -12,7 +12,7 @@ from rtlsdr import RtlSdr
 
 NUM_BYTES = 1024
 maxim = -999
-
+power = []
 
 sdr                 =  RtlSdr()
 sdr.sample_rate     =  1e6  # Hz
